@@ -1,0 +1,54 @@
+Practical Machine Learning Assignment
+========================================================
+
+This is an R Markdown document describing the procedure useed in prediction for the assignment for the Practical Machine Learning Course. The following sections therefore present how the analysis is caried.
+
+To start the analysis, the caret package is loaded in;
+```{r}
+library(caret)
+```
+
+To load in the datasets, i.e. the traning and testing datasets;
+```{r}
+training <- read.csv("C:/Users/Zilon/Downloads/pml-training.csv")
+summary(training)
+testing <- read.csv("C:/Users/Zilon/Downloads/pml-testing.csv")
+summary(testing)
+```
+
+A variety of plots are plotted to view the data in charts. 
+Firstly, the feature plot of all the features of the training data;
+```{r}
+featurePlot(x=training[,c("roll_belt", "pitch_belt", "total_accel_belt")],
+            y = training$raw_timestamp_part_2,
+            plot="pairs")
+```
+
+Also, a qplot of the training data is carried out.
+```{r}
+qq <- qplot(roll_belt, pitch_belt, colour=total_accel_belt,data=training)
+qq + geom_smooth(method='lm', formula=y~x)
+```
+Then, a qplot with colour differentiation is carried out.
+```{r}
+qplot(roll_belt, colour=pitch_belt, data=training, geom="density")
+```
+
+The prediction algorithm is as follows:
+```{r}
+modelFit <- train(raw_timestamp_part_2 ~., data=training, method="glm")
+```
+
+```{r}
+modelFit
+modelFit$finalModel
+```
+
+```{r}
+predictions <- predict(modelFit,newdata=testing)
+predictions
+```
+
+```{r}
+confusionMatrix(predictions, testing$raw_timestamp_part_2)
+```
